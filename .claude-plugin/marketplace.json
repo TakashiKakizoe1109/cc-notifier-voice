@@ -1,0 +1,24 @@
+{
+  "name": "TakashiKakizoe1109",
+  "owner": {
+    "name": "Takashi Kakizoe"
+  },
+  "metadata": {
+    "description": "Plugins by Takashi Kakizoe",
+    "homepage": "https://github.com/TakashiKakizoe1109/cc-notifier-voice"
+  },
+  "plugins": [
+    {
+      "name": "cc-notifier-voice",
+      "version": "0.1.0",
+      "source": "./plugin",
+      "description": "macOS-only: Desktop notifications with voice announcements and Slack integration for Claude Code events",
+      "category": "productivity",
+      "license": "MIT",
+      "tags": ["macos-only"],
+      "keywords": ["notification", "voice", "tts", "macos", "slack"],
+      "homepage": "https://github.com/TakashiKakizoe1109/cc-notifier-voice",
+      "repository": "https://github.com/TakashiKakizoe1109/cc-notifier-voice"
+    }
+  ]
+}
