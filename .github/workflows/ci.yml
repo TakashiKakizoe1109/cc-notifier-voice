@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: ShellCheck + syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: plugin/scripts
+
+      - name: Bash syntax check
+        run: |
+          status=0
+          while IFS= read -r -d '' f; do
+            if ! bash -n "$f"; then
+              echo "FAIL: $f"
+              status=1
+            fi
+          done < <(find plugin/scripts -name '*.sh' -print0)
+          exit "$status"
+
+  test:
+    name: Bats tests
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bats-core
+        run: brew install bats-core
+
+      - name: Run tests
+        run: bats tests/

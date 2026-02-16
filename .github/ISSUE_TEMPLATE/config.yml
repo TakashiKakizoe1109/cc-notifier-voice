@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/TakashiKakizoe1109/cc-notifier-voice/security/advisories/new
+    about: Report security vulnerabilities via GitHub Private Vulnerability Reporting. Do not open a public issue.

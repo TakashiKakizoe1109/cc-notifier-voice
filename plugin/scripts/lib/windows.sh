@@ -1,5 +1,6 @@
 #!/bin/bash
 # Windows / WSL2 implementation (PowerShell Toast + System.Speech TTS)
+# shellcheck disable=SC2016  # PowerShell $variables in single-quoted strings are intentional
 
 if [ -z "$CC_NOTIFIER_VOICE" ] && [ -n "$CC_NOTIFIER_WINDOWS_VOICE" ]; then
   CC_NOTIFIER_VOICE="$CC_NOTIFIER_WINDOWS_VOICE"

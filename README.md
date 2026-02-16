@@ -80,6 +80,14 @@ CC_NOTIFIER_OUTBOUND_MESSAGE_MODE=summary_only
 EOF2
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting.
+
 ## License
 
 [MIT](LICENSE)

@@ -26,7 +26,7 @@ _is_group_or_other_writable_mode() {
   case "$mode" in
     ''|*[!0-7]*) return 0 ;;
   esac
-  local perm="${mode#${mode%???}}"
+  local perm="${mode#"${mode%???}"}"
   [ ${#perm} -eq 3 ] || return 0
   [ $((8#$perm & 8#022)) -ne 0 ]
 }

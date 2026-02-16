@@ -80,6 +80,14 @@ CC_NOTIFIER_OUTBOUND_MESSAGE_MODE=summary_only
 EOF2
 ```
 
+## コントリビュート
+
+開発環境の構築やガイドラインは [CONTRIBUTING.md](../../../CONTRIBUTING.md) を参照してください。
+
+## セキュリティ
+
+脆弱性の報告は [SECURITY.md](../../../SECURITY.md) を参照してください。
+
 ## ライセンス
 
 [MIT](../../../LICENSE)

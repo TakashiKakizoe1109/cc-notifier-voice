@@ -1,0 +1,11 @@
+shell=bash
+
+# Can't follow non-constant source paths (_source_safe pattern)
+disable=SC1090
+
+# Not following sourced files (cross-file references)
+disable=SC1091
+
+# Variables set in sourced library files are used by consuming scripts
+# (e.g. i18n.sh sets MSG_*, config.sh sets CC_NOTIFIER_SOUND_*)
+disable=SC2034
