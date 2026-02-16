@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-02-16
+
+### Fixed
+
+- Fixed "unsafe library file" error on Linux/WSL caused by `stat -f` having different semantics across platforms (macOS: file format, Linux: filesystem info), which made ownership validation always fail
+- Library file ownership check now also accepts root-owned files (UID 0)
+- Improved error diagnostics: the specific check that failed is now included in the error message
+
 ## [0.2.0] - 2026-02-14
 
 ### Added

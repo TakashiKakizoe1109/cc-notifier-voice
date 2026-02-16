@@ -10,13 +10,13 @@
   "plugins": [
     {
       "name": "cc-notifier-voice",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "source": "./plugin",
-      "description": "macOS-only: Desktop notifications with voice announcements and Slack integration for Claude Code events",
+      "description": "Desktop notifications with voice announcements and Slack integration for Claude Code events (macOS/Windows/WSL2)",
       "category": "productivity",
       "license": "MIT",
-      "tags": ["macos-only"],
-      "keywords": ["notification", "voice", "tts", "macos", "slack"],
+      "tags": ["macos", "windows", "wsl2"],
+      "keywords": ["notification", "voice", "tts", "macos", "windows", "wsl2", "slack"],
       "homepage": "https://github.com/TakashiKakizoe1109/cc-notifier-voice",
       "repository": "https://github.com/TakashiKakizoe1109/cc-notifier-voice"
     }

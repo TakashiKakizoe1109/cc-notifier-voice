@@ -5,12 +5,20 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Safe source guards for local library files
+_UNAME_S="$(uname -s)"
+
 _stat_owner() {
-  stat -f '%u' "$1" 2>/dev/null || stat -c '%u' "$1" 2>/dev/null
+  case "$_UNAME_S" in
+    Darwin) stat -f '%u' "$1" 2>/dev/null ;;
+    *)      stat -c '%u' "$1" 2>/dev/null ;;
+  esac
 }
 
 _stat_mode() {
-  stat -f '%Lp' "$1" 2>/dev/null || stat -c '%a' "$1" 2>/dev/null
+  case "$_UNAME_S" in
+    Darwin) stat -f '%Lp' "$1" 2>/dev/null ;;
+    *)      stat -c '%a' "$1" 2>/dev/null ;;
+  esac
 }
 
 _is_group_or_other_writable_mode() {
@@ -25,23 +33,29 @@ _is_group_or_other_writable_mode() {
 
 _is_safe_source_file() {
   local path="$1"
-  [ -n "$path" ] || return 1
-  [ -f "$path" ] || return 1
-  [ -L "$path" ] && return 1
+  [ -n "$path" ] || { _SAFE_FAIL="empty path"; return 1; }
+  [ -f "$path" ] || { _SAFE_FAIL="not a regular file"; return 1; }
+  [ -L "$path" ] && { _SAFE_FAIL="symlink"; return 1; }
 
   local owner mode
-  owner=$(_stat_owner "$path") || return 1
-  mode=$(_stat_mode "$path") || return 1
+  owner=$(_stat_owner "$path") || { _SAFE_FAIL="cannot stat owner"; return 1; }
+  mode=$(_stat_mode "$path") || { _SAFE_FAIL="cannot stat mode"; return 1; }
 
-  [ "$owner" = "$(id -u)" ] || return 1
-  _is_group_or_other_writable_mode "$mode" && return 1
+  # Accept files owned by current user or root (UID 0)
+  local my_uid
+  my_uid=$(id -u)
+  [ "$owner" = "$my_uid" ] || [ "$owner" = "0" ] || {
+    _SAFE_FAIL="owner=$owner, expected=$my_uid or 0"; return 1; }
+  _is_group_or_other_writable_mode "$mode" && {
+    _SAFE_FAIL="group/other writable (mode=$mode)"; return 1; }
   return 0
 }
 
 _source_safe() {
   local path="$1"
+  _SAFE_FAIL=""
   if ! _is_safe_source_file "$path"; then
-    echo "cc-notifier-voice: unsafe library file, refusing to load: $path" >&2
+    echo "cc-notifier-voice: unsafe library file, refusing to load: $path (${_SAFE_FAIL})" >&2
     exit 1
   fi
   # shellcheck disable=SC1090

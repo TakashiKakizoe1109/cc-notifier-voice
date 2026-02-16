@@ -1,6 +1,6 @@
 {
   "name": "cc-notifier-voice",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Desktop notifications with voice announcements and Slack integration for Claude Code events (macOS/Windows/WSL2)",
   "author": {
     "name": "Takashi Kakizoe"
