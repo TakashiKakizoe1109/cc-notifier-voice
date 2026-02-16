@@ -10,22 +10,19 @@ _CC_CONFIG_FILE="${CC_NOTIFIER_CONFIG:-$HOME/.config/cc-notifier-voice/config}"
 _CC_NOTIFIER_DEFAULT_BINARY_SHA256="1acaab63a198bdc8a04a8db9ee84770ad7ddc125998ebceda5bff1a69d06de9b"
 
 _cc_cfg_stat_owner() {
-  stat -f '%u' "$1" 2>/dev/null || stat -c '%u' "$1" 2>/dev/null
+  case "$(uname -s)" in
+    Darwin) stat -f '%u' "$1" 2>/dev/null ;;
+    *)      stat -c '%u' "$1" 2>/dev/null ;;
+  esac
 }
 
 _cc_cfg_stat_mode() {
-  stat -f '%Lp' "$1" 2>/dev/null || stat -c '%a' "$1" 2>/dev/null
+  case "$(uname -s)" in
+    Darwin) stat -f '%Lp' "$1" 2>/dev/null ;;
+    *)      stat -c '%a' "$1" 2>/dev/null ;;
+  esac
 }
 
-_is_group_or_other_writable_mode() {
-  local mode="$1"
-  case "$mode" in
-    ''|*[!0-7]*) return 0 ;;
-  esac
-  local perm="${mode#${mode%???}}"
-  [ ${#perm} -eq 3 ] || return 0
-  [ $((8#$perm & 8#022)) -ne 0 ]
-}
 
 _cc_config_safe=false
 if [ -f "$_CC_CONFIG_FILE" ]; then

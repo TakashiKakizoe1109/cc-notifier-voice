@@ -70,15 +70,6 @@ _sha256_file() {
   return 1
 }
 
-_is_group_or_other_writable_mode() {
-  local mode="$1"
-  case "$mode" in
-    ''|*[!0-7]*) return 0 ;;
-  esac
-  local perm="${mode#${mode%???}}"
-  [ ${#perm} -eq 3 ] || return 0
-  [ $((8#$perm & 8#022)) -ne 0 ]
-}
 
 _is_bundle_dir_safe() {
   local path="$1"

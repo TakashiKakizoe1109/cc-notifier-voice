@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- Fixed "unsafe library file" error on Linux/WSL caused by `stat -f` having different semantics across platforms (macOS: file format, Linux: filesystem info), which made ownership validation always fail
+- Fixed "unsafe library file" error on Linux/WSL caused by `stat -f` having different semantics across platforms (macOS: file format, Linux: filesystem info), which made ownership validation always fail on both the main script and state management
+- Fixed notifications and TTS not working on WSL2 where Windows PowerShell 5.1 does not support passing arguments alongside `-EncodedCommand`
+- Fixed toast notification banners not displaying on Windows by auto-registering AppID in user registry with fallback to PowerShell AppID
 - Library file ownership check now also accepts root-owned files (UID 0)
 - Improved error diagnostics: the specific check that failed is now included in the error message
 

@@ -75,9 +75,26 @@ _encode_powershell_script() {
   _b64_utf16le "$script"
 }
 
+# Windows PowerShell 5.1 does not support passing arguments alongside
+# -EncodedCommand. Inject an $args array declaration into the script so
+# the existing $args[N] references keep working.
+_ps_inject_args() {
+  local decl='$args = @('
+  local first=true
+  local arg
+  for arg in "$@"; do
+    if [ "$first" = true ]; then first=false; else decl+=','; fi
+    decl+="'$arg'"
+  done
+  decl+=")"
+  printf '%s\n' "$decl"
+}
+
 _run_powershell_encoded() {
   local script="$1"
   shift
+
+  script="$(_ps_inject_args "$@")${script}"
 
   local encoded_script
   encoded_script=$(_encode_powershell_script "$script") || {
@@ -89,13 +106,14 @@ _run_powershell_encoded() {
     -NoProfile \
     -NonInteractive \
     -ExecutionPolicy Bypass \
-    -EncodedCommand "$encoded_script" \
-    "$@" >/dev/null 2>&1
+    -EncodedCommand "$encoded_script" >/dev/null 2>&1
 }
 
 _run_powershell_encoded_bg() {
   local script="$1"
   shift
+
+  script="$(_ps_inject_args "$@")${script}"
 
   local encoded_script
   encoded_script=$(_encode_powershell_script "$script") || {
@@ -107,8 +125,7 @@ _run_powershell_encoded_bg() {
     -NoProfile \
     -NonInteractive \
     -ExecutionPolicy Bypass \
-    -EncodedCommand "$encoded_script" \
-    "$@" >/dev/null 2>&1 &
+    -EncodedCommand "$encoded_script" >/dev/null 2>&1 &
   echo $!
 }
 
@@ -163,6 +180,18 @@ try {
   $appId = Decode $args[3]
   $soundUri = Decode $args[4]
   if ([string]::IsNullOrEmpty($appId)) { $appId = "cc-notifier-voice" }
+  $psAppId = "{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe"
+
+  # Try to register custom AppID in HKCU (no admin required)
+  $useAppId = $psAppId
+  try {
+    $regPath = "HKCU:\SOFTWARE\Classes\AppUserModelId\$appId"
+    if (-not (Test-Path $regPath)) {
+      New-Item -Path $regPath -Force > $null
+      Set-ItemProperty -Path $regPath -Name "DisplayName" -Value "Claude Code Notifier" -Force
+    }
+    $useAppId = $appId
+  } catch {}
 
   [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
   [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom.XmlDocument, ContentType = WindowsRuntime] > $null
@@ -178,13 +207,13 @@ try {
   $toast = [Windows.UI.Notifications.ToastNotification]::new($doc)
   $shown = $false
   try {
-    $notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($appId)
+    $notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($useAppId)
     $notifier.Show($toast)
     $shown = $true
   } catch {}
   if (-not $shown) {
     try {
-      $fallbackNotifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier()
+      $fallbackNotifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($psAppId)
       $fallbackNotifier.Show($toast)
       $shown = $true
     } catch {}
