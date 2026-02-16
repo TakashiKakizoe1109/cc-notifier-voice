@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-02-14
+
+### Added
+
+- Windows 11 and WSL2 support for Claude Code hook notifications
+- New platform detection layer (`plugin/scripts/lib/platform.sh`) using shell best-practice auto detection (`uname -s` + WSL env vars + `/proc` fallback + `OSTYPE` fallback)
+- Windows/WSL2 notification backend (`plugin/scripts/lib/windows.sh`) using PowerShell Toast API and `System.Speech` TTS
+- New Windows-related config keys:
+  - `CC_NOTIFIER_WINDOWS_POWERSHELL_PATH`
+  - `CC_NOTIFIER_WINDOWS_APP_ID`
+  - `CC_NOTIFIER_WINDOWS_VOICE`
+- Smoke tests for platform detection and Windows backend:
+  - `plugin/scripts/tests/test_platform.sh`
+  - `plugin/scripts/tests/test_windows_backend.sh`
+
+### Changed
+
+- Hook entrypoint now dispatches notification/TTS implementation by detected platform instead of macOS-only guard
+- Plugin metadata and README updated from macOS-only wording to macOS/Windows/WSL2 support
+- Configuration guides (EN/JA) updated with Windows/WSL2 settings and troubleshooting
+
+### Fixed
+
+- Unsupported platforms no longer fail hard; hooks now log and safely skip notification processing
+- macOS notification sound routing now resolves bundled sound names (`info`/`warning`/`complete`/`end`) more reliably and falls back to default sound when a custom sound resource is missing
+- macOS direct notifier now waits for notification enqueue completion before exit to reduce intermittent sound delivery issues
+- Windows PowerShell backend command detection now supports absolute paths (including paths with spaces) via `CC_NOTIFIER_WINDOWS_POWERSHELL_PATH`
+
 ## [0.1.0] - 2026-02-10
 
 Initial release.

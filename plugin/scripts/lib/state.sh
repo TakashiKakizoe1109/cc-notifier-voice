@@ -3,6 +3,14 @@
 
 STATE_DIR="$HOME/.claude/.hook-state"
 
+_cc_state_stat_owner() {
+  stat -f '%u' "$1" 2>/dev/null || stat -c '%u' "$1" 2>/dev/null
+}
+
+_cc_state_stat_mode() {
+  stat -f '%Lp' "$1" 2>/dev/null || stat -c '%a' "$1" 2>/dev/null
+}
+
 _is_group_or_other_writable_mode() {
   local mode="$1"
   case "$mode" in
@@ -21,9 +29,9 @@ _is_dir_safe() {
   [ -d "$dir" ] || return 1
   # Must be owned by current user
   local owner mode
-  owner=$(stat -f '%u' "$dir" 2>/dev/null) || return 1
+  owner=$(_cc_state_stat_owner "$dir") || return 1
   [ "$owner" = "$(id -u)" ] || return 1
-  mode=$(stat -f '%Lp' "$dir" 2>/dev/null) || return 1
+  mode=$(_cc_state_stat_mode "$dir") || return 1
   _is_group_or_other_writable_mode "$mode" && return 1
   return 0
 }

@@ -24,6 +24,11 @@ EOF2
 
 `設定ファイル > 環境変数 > デフォルト`
 
+## Windows / WSL2 の前提条件
+
+- Hook は bash スクリプトで実行されます。Windows 11 では Git Bash/MSYS2/Cygwin 上で Claude Code を起動してください（PowerShell シェル単体は非対応）。
+- 必須コマンド: `bash`, `jq`, `iconv`, `base64`, `powershell.exe`（または `CC_NOTIFIER_WINDOWS_POWERSHELL_PATH` で指定する互換コマンド）。
+
 ## 環境変数
 
 ### 基本設定
@@ -38,6 +43,9 @@ EOF2
 | `CC_NOTIFIER_LANG`                | 自動     | 言語 (`ja` / `en`)   |
 | `CC_NOTIFIER_VOICE`               | 自動     | 音声名                |
 | `CC_NOTIFIER_TTS_MESSAGE_ENABLED` | `true` | 通知メッセージ内容を TTS で読む |
+| `CC_NOTIFIER_WINDOWS_POWERSHELL_PATH` | `powershell.exe` | Windows/WSL2 で使う PowerShell コマンド |
+| `CC_NOTIFIER_WINDOWS_APP_ID`      | `cc-notifier-voice` | Windows Toast の App ID |
+| `CC_NOTIFIER_WINDOWS_VOICE`       | (空)     | Windows 音声名の任意上書き |
 
 ### イベント別チャンネル制御
 
@@ -120,9 +128,10 @@ CC_NOTIFIER_OUTBOUND_MESSAGE_MODE=summary_only
 
 ## トラブルシューティング
 
-- 通知が出ない: macOS の `CCNotifier` 通知許可を確認
+- 通知が出ない（macOS）: `CCNotifier` の通知許可を確認
+- 通知が出ない（Windows/WSL2）: シェルから `bash` / `jq` / `iconv` / `base64` / `powershell.exe` が実行できるか確認
 - 設定が反映されない: `~/.zshrc` ではなく設定ファイルを利用
-- 日本語音声が出ない: macOS で `Kyoko` を追加
+- 日本語音声が出ない（macOS）: `Kyoko` を追加
 
 ## 関連ドキュメント
 

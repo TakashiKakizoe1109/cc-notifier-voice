@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "cc-notifier-voice",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "source": "./plugin",
       "description": "macOS-only: Desktop notifications with voice announcements and Slack integration for Claude Code events",
       "category": "productivity",

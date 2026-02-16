@@ -50,20 +50,28 @@ _source_safe() {
 
 # Load config (env defaults, config file, feature checks)
 _source_safe "$SCRIPT_DIR/lib/config.sh"
+_source_safe "$SCRIPT_DIR/lib/platform.sh"
 
 # Check if notifications are globally enabled
 is_enabled || exit 0
 
-# macOS guard
-if [ "$(uname -s)" != "Darwin" ]; then
-  echo "Error: cc-notifier-voice requires macOS 11.0 or later." >&2
-  exit 1
-fi
-
 _source_safe "$SCRIPT_DIR/lib/i18n.sh"      # language messages
 _source_safe "$SCRIPT_DIR/lib/state.sh"     # SubAgent state management
-_source_safe "$SCRIPT_DIR/lib/macos.sh"     # notification + TTS
 _source_safe "$SCRIPT_DIR/lib/slack.sh"     # Slack + generic webhook
+
+PLATFORM="$(detect_platform)"
+case "$PLATFORM" in
+  macos)
+    _source_safe "$SCRIPT_DIR/lib/macos.sh"
+    ;;
+  windows|wsl)
+    _source_safe "$SCRIPT_DIR/lib/windows.sh"
+    ;;
+  *)
+    echo "cc-notifier-voice: platform '$PLATFORM' is not supported, skipping notification hooks" >&2
+    exit 0
+    ;;
+esac
 
 cleanup_stale_state
 

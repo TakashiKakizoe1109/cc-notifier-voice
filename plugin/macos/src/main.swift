@@ -15,20 +15,43 @@ let notificationDelegate = NotificationDelegate()
 
 // MARK: - Notification Delivery
 
+func resolveNotificationSound(_ sound: String?) -> UNNotificationSound? {
+    guard let rawSound = sound?.trimmingCharacters(in: .whitespacesAndNewlines), !rawSound.isEmpty else {
+        return nil
+    }
+
+    if rawSound == "default" {
+        return .default
+    }
+
+    let lower = rawSound.lowercased()
+    let normalized: String
+    switch lower {
+    case "info", "warning", "complete", "end":
+        normalized = "\(lower).aiff"
+    default:
+        normalized = lower.hasSuffix(".aiff") ? lower : "\(lower).aiff"
+    }
+
+    let resourceName = normalized.replacingOccurrences(of: ".aiff", with: "")
+    guard Bundle.main.url(forResource: resourceName, withExtension: "aiff") != nil else {
+        fputs("Notification sound not found in bundle: \(normalized)\n", stderr)
+        return .default
+    }
+
+    return UNNotificationSound(named: UNNotificationSoundName(rawValue: normalized))
+}
+
 func deliverNotification(title: String, subtitle: String, message: String,
-                         sound: String?, groupId: String?, iconURL: String?) {
+                         sound: String?, groupId: String?, iconURL: String?,
+                         completion: ((Error?) -> Void)? = nil) {
     let content = UNMutableNotificationContent()
     content.title = title
     content.subtitle = subtitle
     content.body = message
 
-    if let snd = sound, !snd.isEmpty {
-        if snd == "default" {
-            content.sound = .default
-        } else {
-            let soundName = snd.hasSuffix(".aiff") ? snd : "\(snd).aiff"
-            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
-        }
+    if let resolvedSound = resolveNotificationSound(sound) {
+        content.sound = resolvedSound
     }
 
     if let gid = groupId, !gid.isEmpty {
@@ -52,6 +75,7 @@ func deliverNotification(title: String, subtitle: String, message: String,
         if let error = error {
             fputs("Notification error: \(error.localizedDescription)\n", stderr)
         }
+        completion?(error)
     }
 }
 
@@ -114,10 +138,11 @@ func runDirect(args: [String]) {
         deliverNotification(
             title: title, subtitle: subtitle, message: message,
             sound: sound, groupId: groupId, iconURL: iconURL
-        )
-        // Allow time for notification delivery before exiting
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            exit(0)
+        ) { _ in
+            // Keep process alive slightly longer so banner/sound dispatch is stable.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                exit(0)
+            }
         }
     }
 

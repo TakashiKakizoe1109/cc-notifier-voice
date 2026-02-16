@@ -1,5 +1,5 @@
 {
-  "description": "macOS notifications with voice announcements for Claude Code",
+  "description": "Desktop notifications with voice announcements for Claude Code (macOS/Windows/WSL2)",
   "hooks": {
     "Notification": [
       {

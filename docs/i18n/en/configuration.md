@@ -24,6 +24,11 @@ EOF2
 
 `Config file > Environment variable > Default`
 
+## Windows / WSL2 Prerequisites
+
+- Hooks are bash scripts. On Windows 11, run Claude Code from Git Bash/MSYS2/Cygwin (PowerShell-only shells are unsupported).
+- Required commands: `bash`, `jq`, `iconv`, `base64`, and `powershell.exe` (or a compatible path via `CC_NOTIFIER_WINDOWS_POWERSHELL_PATH`).
+
 ## Environment Variables
 
 ### General
@@ -38,6 +43,9 @@ EOF2
 | `CC_NOTIFIER_LANG`                | Auto    | Language (`ja` / `en`)                    |
 | `CC_NOTIFIER_VOICE`               | Auto    | Voice name                                |
 | `CC_NOTIFIER_TTS_MESSAGE_ENABLED` | `true`  | Read notification message content via TTS |
+| `CC_NOTIFIER_WINDOWS_POWERSHELL_PATH` | `powershell.exe` | PowerShell command path for Windows/WSL2 |
+| `CC_NOTIFIER_WINDOWS_APP_ID`      | `cc-notifier-voice` | Windows toast App ID |
+| `CC_NOTIFIER_WINDOWS_VOICE`       | (empty) | Optional Windows voice name override |
 
 ### Per-Event Channel Control
 
@@ -120,9 +128,10 @@ CC_NOTIFIER_OUTBOUND_MESSAGE_MODE=summary_only
 
 ## Troubleshooting
 
-- No notifications: check macOS notification permission for `CCNotifier`
+- No notifications (macOS): check notification permission for `CCNotifier`
+- No notifications (Windows/WSL2): confirm `bash`, `jq`, `iconv`, `base64`, and `powershell.exe` are available from your shell
 - Settings ignored: use config file, not `~/.zshrc`
-- No Japanese voice: install `Kyoko` from macOS voice settings
+- No Japanese voice (macOS): install `Kyoko` from macOS voice settings
 
 ## Related
 

@@ -7,7 +7,15 @@
 # ============================================================================
 
 _CC_CONFIG_FILE="${CC_NOTIFIER_CONFIG:-$HOME/.config/cc-notifier-voice/config}"
-_CC_NOTIFIER_DEFAULT_BINARY_SHA256="b84dcf4dc5d4d42eaa17eeabe580306b69ed83bf993d6d83435f03b5c1f66d04"
+_CC_NOTIFIER_DEFAULT_BINARY_SHA256="1acaab63a198bdc8a04a8db9ee84770ad7ddc125998ebceda5bff1a69d06de9b"
+
+_cc_cfg_stat_owner() {
+  stat -f '%u' "$1" 2>/dev/null || stat -c '%u' "$1" 2>/dev/null
+}
+
+_cc_cfg_stat_mode() {
+  stat -f '%Lp' "$1" 2>/dev/null || stat -c '%a' "$1" 2>/dev/null
+}
 
 _is_group_or_other_writable_mode() {
   local mode="$1"
@@ -26,8 +34,8 @@ if [ -f "$_CC_CONFIG_FILE" ]; then
     _cc_config_safe=false
   else
   # Verify ownership and permissions before loading
-  _cc_file_owner=$(stat -f '%u' "$_CC_CONFIG_FILE" 2>/dev/null)
-  _cc_file_mode=$(stat -f '%Lp' "$_CC_CONFIG_FILE" 2>/dev/null)
+  _cc_file_owner=$(_cc_cfg_stat_owner "$_CC_CONFIG_FILE")
+  _cc_file_mode=$(_cc_cfg_stat_mode "$_CC_CONFIG_FILE")
   _cc_config_safe=true
   if [ "$_cc_file_owner" != "$(id -u)" ]; then
     echo "cc-notifier-voice: config file not owned by current user, skipping" >&2
@@ -39,8 +47,8 @@ if [ -f "$_CC_CONFIG_FILE" ]; then
   fi
   if [ "$_cc_config_safe" = "true" ]; then
     _cc_parent_dir=$(dirname "$_CC_CONFIG_FILE")
-    _cc_parent_owner=$(stat -f '%u' "$_cc_parent_dir" 2>/dev/null)
-    _cc_parent_mode=$(stat -f '%Lp' "$_cc_parent_dir" 2>/dev/null)
+    _cc_parent_owner=$(_cc_cfg_stat_owner "$_cc_parent_dir")
+    _cc_parent_mode=$(_cc_cfg_stat_mode "$_cc_parent_dir")
     if [ "$_cc_parent_owner" != "$(id -u)" ]; then
       echo "cc-notifier-voice: config parent dir not owned by current user, skipping" >&2
       _cc_config_safe=false
@@ -73,6 +81,9 @@ if [ "$_cc_config_safe" = "true" ]; then
       CC_NOTIFIER_LANG)               CC_NOTIFIER_LANG="$_val" ;;
       CC_NOTIFIER_VOICE)              CC_NOTIFIER_VOICE="$_val" ;;
       CC_NOTIFIER_TTS_MESSAGE_ENABLED) CC_NOTIFIER_TTS_MESSAGE_ENABLED="$_val" ;;
+      CC_NOTIFIER_WINDOWS_POWERSHELL_PATH) CC_NOTIFIER_WINDOWS_POWERSHELL_PATH="$_val" ;;
+      CC_NOTIFIER_WINDOWS_APP_ID)     CC_NOTIFIER_WINDOWS_APP_ID="$_val" ;;
+      CC_NOTIFIER_WINDOWS_VOICE)      CC_NOTIFIER_WINDOWS_VOICE="$_val" ;;
       CC_NOTIFIER_TTS_EVENTS)         CC_NOTIFIER_TTS_EVENTS="$_val" ;;
       CC_NOTIFIER_VISUAL_EVENTS)      CC_NOTIFIER_VISUAL_EVENTS="$_val" ;;
       CC_NOTIFIER_COOLDOWN)           CC_NOTIFIER_COOLDOWN="$_val" ;;
@@ -106,6 +117,9 @@ unset _cc_config_safe
 : "${CC_NOTIFIER_SOUND_ENABLED:=true}"
 : "${CC_NOTIFIER_SPEED:=250}"
 : "${CC_NOTIFIER_TTS_MESSAGE_ENABLED:=true}"
+: "${CC_NOTIFIER_WINDOWS_POWERSHELL_PATH:=powershell.exe}"
+: "${CC_NOTIFIER_WINDOWS_APP_ID:=cc-notifier-voice}"
+: "${CC_NOTIFIER_WINDOWS_VOICE:=}"
 : "${CC_NOTIFIER_TTS_EVENTS:=all}"
 : "${CC_NOTIFIER_VISUAL_EVENTS:=all}"
 : "${CC_NOTIFIER_COOLDOWN:=0}"
@@ -136,6 +150,12 @@ fi
 case "$CC_NOTIFIER_SPEED" in
   ''|*[!0-9]*) CC_NOTIFIER_SPEED=250 ;;
 esac
+
+# Validate: powershell command path cannot be empty
+[ -z "$CC_NOTIFIER_WINDOWS_POWERSHELL_PATH" ] && CC_NOTIFIER_WINDOWS_POWERSHELL_PATH="powershell.exe"
+
+# Validate: app id cannot be empty
+[ -z "$CC_NOTIFIER_WINDOWS_APP_ID" ] && CC_NOTIFIER_WINDOWS_APP_ID="cc-notifier-voice"
 
 # Validate: cooldown must be numeric
 case "$CC_NOTIFIER_COOLDOWN" in

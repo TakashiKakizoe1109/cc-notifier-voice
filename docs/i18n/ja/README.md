@@ -2,15 +2,15 @@
 
 [English](../../../README.md) | [日本語](README.md)
 
-Claude Code のイベントを、macOS の通知と音声読み上げ (TTS) で知らせるプラグイン。
+Claude Code のイベントを、macOS / Windows / WSL2 の通知と音声読み上げ (TTS) で知らせるプラグイン。
 
-![macOS](https://img.shields.io/badge/platform-macOS%2011.0%2B-blue)
+![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%2011%20%7C%20WSL2-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## できること
 
 - Claude Code の各イベントでデスクトップ通知を表示
-- macOS TTS で読み上げ
+- ネイティブ TTS で読み上げ
 - イベントタイプごとに異なる通知音
 - オプションで Slack / 汎用 Webhook 通知
 - SubAgent 実行中は Stop 通知を抑制して誤通知を防止
@@ -46,8 +46,13 @@ CC_NOTIFIER_OUTBOUND_MESSAGE_MODE=summary_only
 
 ## 動作環境
 
-- macOS 11.0 以降
 - Claude Code
+- 以下のいずれか:
+  - macOS 11.0 以降
+  - Windows 11（Git Bash/MSYS2/Cygwin など `bash` 実行環境 + `jq` / `iconv` / `base64` / `powershell.exe` が利用可能）
+  - Windows 11 上の WSL2（`bash` / `jq` / `iconv` / `base64` が利用可能で、`powershell.exe` 連携が有効）
+
+PowerShell のみのネイティブ実行は非対応です。Hook は `plugin/scripts/cc-notifier.sh`（`#!/bin/bash`）として実行されます。
 
 ## インストール
 

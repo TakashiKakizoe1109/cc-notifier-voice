@@ -2,15 +2,15 @@
 
 [English](README.md) | [日本語](docs/i18n/ja/README.md)
 
-macOS notification plugin for Claude Code with voice announcements (TTS).
+Desktop notification plugin for Claude Code with voice announcements (TTS) on macOS, Windows, and WSL2.
 
-![macOS](https://img.shields.io/badge/platform-macOS%2011.0%2B-blue)
+![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%2011%20%7C%20WSL2-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## What It Does
 
 - Shows desktop notifications for Claude Code hook events
-- Reads messages aloud with macOS TTS
+- Reads messages aloud with native TTS
 - Distinct notification sounds per event type
 - Optionally sends event summaries to Slack or generic webhook endpoints
 - Suppresses noisy stop alerts while SubAgents are running
@@ -46,8 +46,13 @@ CC_NOTIFIER_OUTBOUND_MESSAGE_MODE=summary_only
 
 ## Requirements
 
-- macOS 11.0 or later
 - Claude Code
+- One of:
+  - macOS 11.0 or later
+  - Windows 11 with POSIX shell runtime (`bash` via Git Bash/MSYS2/Cygwin) and tools: `jq`, `iconv`, `base64`, `powershell.exe`
+  - WSL2 on Windows 11 with tools: `bash`, `jq`, `iconv`, `base64` and `powershell.exe` interop available
+
+PowerShell-only native execution is not supported. Hooks execute via `plugin/scripts/cc-notifier.sh` (`#!/bin/bash`).
 
 ## Installation
 
